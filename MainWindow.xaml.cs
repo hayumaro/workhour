@@ -9,43 +9,11 @@ namespace workhour {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
-    public class Work : INotifyPropertyChanged {
-        private string _content = "";
-        private DateTime _begin = new();
-        private DateTime _end = new();
-        private TimeSpan _hour = new();
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        public required string Content {
-            get => _content;
-            set {
-                _content = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Content"));
-            }
-        }
-        public required DateTime Begin {
-            get => _begin;
-            set {
-                _begin = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Begin"));
-            }
-        }
-
-        public required DateTime End {
-            get => _end;
-            set {
-                _end = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("End"));
-            }
-        }
-
-        public required TimeSpan Hour {
-            get => _hour;
-            set {
-                _hour = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Hour"));
-            }
-        }
+    public class Work {
+        public required string Content { get; init; }
+        public required DateTime Begin { get; init; }
+        public required DateTime End { get; init; }
+        public required TimeSpan Hour { get; init; }
     }
 
     public partial class MainWindow : Window {
@@ -55,12 +23,24 @@ namespace workhour {
         private readonly SolidColorBrush _endButton = new(Color.FromRgb(228, 191, 191));
         private bool recording = false;
 
-        public ObservableCollection<Work> _works { get; set; }
+        public ObservableCollection<Work> Works { get; set; }
+        public ObservableCollection<string> WorkCases { get; set; }
 
         public MainWindow() {
             InitializeComponent();
-            _works = [];
-            DataContext = _works;
+            WorkCases = [
+                "打合せ",
+                "総務"
+            ];
+            Works = [];
+            DataContext = this;
+            Closing += MainWindow_Closing;
+        }
+
+        private void MainWindow_Closing(object? sender, CancelEventArgs e) {
+            foreach (var work in Works) {
+                // 1行ごとSQLServerに登録する
+            }
         }
 
         private void RecordButton_Click(object sender, RoutedEventArgs e) {
@@ -68,7 +48,7 @@ namespace workhour {
                 _end = AdjustEndTime(DateTime.Now);
                 var workHour = CalcWorkHour(_begin, _end);
 
-                _works.Add(new Work {
+                Works.Add(new Work {
                     Content = WorkContent.Text,
                     Begin = _begin,
                     End = _end,
@@ -81,6 +61,10 @@ namespace workhour {
 
                 WorkContent.Clear();
             } else {
+                if (WorkContent.Text == string.Empty) {
+                    MessageBox.Show("作業内容を入力してください");
+                    return;
+                }
                 _begin = AdjustBeginTime(DateTime.Now);
                 if (_begin < _end) {
                     _begin = _end;

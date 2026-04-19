@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="449" Width="408">
     <Grid Margin="0,0,0,-16">
-        <TextBox x:Name="WorkContent" HorizontalAlignment="Left" Margin="58,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="295" Height="57" FontFamily="Noto Sans JP DemiLight" FontSize="16"/>
-        <Button x:Name="RecordButton" Content="開始" HorizontalAlignment="Left" Margin="58,94,0,0" VerticalAlignment="Top" Height="102" Width="295" FontFamily="Noto Sans JP DemiLight" FontSize="20" Click="RecordButton_Click" Background="#FFBFE4CA"/>
-        <ListView ItemsSource="{Binding}" Margin="10,214,10,26" FontFamily="Noto Sans JP DemiLight" FontSize="14">
+        <TextBox x:Name="WorkContent" HorizontalAlignment="Left" Margin="58,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="295" Height="46" FontFamily="Noto Sans JP DemiLight" FontSize="16"/>
+        <Button x:Name="RecordButton" Content="開始" HorizontalAlignment="Left" Margin="58,139,0,0" VerticalAlignment="Top" Height="57" Width="295" FontFamily="Noto Sans JP DemiLight" FontSize="20" Click="RecordButton_Click" Background="#FFBFE4CA"/>
+        <ListView ItemsSource="{Binding Works}" Margin="10,214,10,26" FontFamily="Noto Sans JP DemiLight" FontSize="14" d:ItemsSource="{d:SampleData ItemCount=5}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="内容" DisplayMemberBinding="{Binding Content}" />
@@ -17,7 +17,8 @@
                     <GridViewColumn Header="終了" DisplayMemberBinding="{Binding End, StringFormat=HH:mm}" />
                     <GridViewColumn Header="工数" DisplayMemberBinding="{Binding Hour, StringFormat=hh\\:mm}" />
                 </GridView>
-                </ListView.View>
+            </ListView.View>
         </ListView>
+        <ComboBox Margin="58,85,55,329" ItemsSource="{Binding WorkCases}" RenderTransformOrigin="0.498,0.73" FontFamily="Noto Sans JP DemiLight" FontSize="16"/>
     </Grid>
 </Window>
