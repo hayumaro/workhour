@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace workhour {
@@ -14,6 +15,7 @@ namespace workhour {
         public required DateTime Begin { get; init; }
         public required DateTime End { get; init; }
         public required TimeSpan Hour { get; init; }
+        public required string Case { get; init; }
     }
 
     public partial class MainWindow : Window {
@@ -39,7 +41,7 @@ namespace workhour {
 
         private void MainWindow_Closing(object? sender, CancelEventArgs e) {
             foreach (var work in Works) {
-                // 1行ごとSQLServerに登録する
+                // 1行ごとデータベースに登録する
             }
         }
 
@@ -49,13 +51,18 @@ namespace workhour {
                 if (_begin.Hour == _end.Hour && _begin.Minute == _end.Minute) {
                     StatusText.Text = "工数が0のため記録しません";
                 } else {
+                    var workCase = WorkCasePanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true)!;
                     Works.Add(new Work {
                         Content = WorkContent.Text,
                         Begin = _begin,
                         End = _end,
-                        Hour = CalcWorkHour(_begin, _end)
+                        Hour = CalcWorkHour(_begin, _end),
+                        Case = workCase.Content.ToString()
                     });
+                    workCase.IsChecked = false;
+                    StatusText.Text = WorkContent.Text + "を" + _end.ToShortTimeString() + "に終了しました";
                 }
+                WorkCasePanel.IsEnabled = true;
                 RecordButton.Background = _beginButton;
                 RecordButton.Content = "開始";
                 WorkContent.IsReadOnly = false;
@@ -66,6 +73,11 @@ namespace workhour {
                     MessageBox.Show("作業内容を入力してください");
                     return;
                 }
+                if (WorkCasePanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true) is null) {
+                    MessageBox.Show("作業区分を入力してください");
+                    return;
+                }
+                WorkCasePanel.IsEnabled = false;
                 _begin = AdjustBeginTime(DateTime.Now);
                 if (_begin < _end) {
                     _begin = _end;
@@ -94,30 +106,30 @@ namespace workhour {
             return end - begin;
         }
 
-        private void JimuButton_Click(object sender, RoutedEventArgs e) {
+        private void ShortcutButtons_Click(object sender, RoutedEventArgs e) {
             if (recording) {
                 StatusText.Text = "作業中のため開始できません";
                 return;
             }
-            WorkContent.Text = "事務作業";
-            RecordButton_Click(sender, e);
-        }
-
-        private void InnerMtgButton_Click(object sender, RoutedEventArgs e) {
-            if (recording) {
-                StatusText.Text = "作業中のため開始できません";
+            if (sender is not Button button) {
                 return;
             }
-            WorkContent.Text = "部内会議";
-            RecordButton_Click(sender, e);
-        }
-
-        private void PcSetupButton_Click(object sender, RoutedEventArgs e) {
-            if (recording) {
-                StatusText.Text = "作業中のため開始できません";
-                return;
-            }
-            WorkContent.Text = "PCセットアップ";
+            WorkContent.Text = ((Button)sender).Content.ToString() switch {
+                "事務" => "事務作業",
+                "部会" => "部内会議",
+                "PC" => "PCセットアップ",
+                "点検" => "点検",
+                "問い合わせ" => "問い合わせ対応",
+            };
+            var workCaseName = ((Button)sender).Content.ToString() switch {
+                "事務" => "事務",
+                "部会" => "打ち合わせ",
+                "PC" => "ハード管理",
+                "点検" => "定例",
+                "問い合わせ" => "問い合わせ",
+            };
+            var workCase = WorkCasePanel.Children.OfType<RadioButton>().FirstOrDefault(r => r.Content.ToString() == workCaseName)!;
+            workCase.IsChecked = true;
             RecordButton_Click(sender, e);
         }
     }
