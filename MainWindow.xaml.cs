@@ -46,19 +46,20 @@ namespace workhour {
         private void RecordButton_Click(object sender, RoutedEventArgs e) {
             if (recording) {
                 _end = AdjustEndTime(DateTime.Now);
-                var workHour = CalcWorkHour(_begin, _end);
-
-                Works.Add(new Work {
-                    Content = WorkContent.Text,
-                    Begin = _begin,
-                    End = _end,
-                    Hour = workHour
-                });
-
+                if (_begin.Hour == _end.Hour && _begin.Minute == _end.Minute) {
+                    StatusText.Text = "工数が0のため記録しません";
+                } else {
+                    Works.Add(new Work {
+                        Content = WorkContent.Text,
+                        Begin = _begin,
+                        End = _end,
+                        Hour = CalcWorkHour(_begin, _end)
+                    });
+                }
                 RecordButton.Background = _beginButton;
                 RecordButton.Content = "開始";
+                WorkContent.IsReadOnly = false;
                 recording = false;
-
                 WorkContent.Clear();
             } else {
                 if (WorkContent.Text == string.Empty) {
@@ -71,7 +72,9 @@ namespace workhour {
                 }
                 RecordButton.Background = _endButton;
                 RecordButton.Content = "終了";
+                WorkContent.IsReadOnly = true;
                 recording = true;
+                StatusText.Text = WorkContent.Text + "を" + _begin.ToShortTimeString() + "に開始しました";
             }
         }
 
@@ -89,6 +92,33 @@ namespace workhour {
 
         static private TimeSpan CalcWorkHour(DateTime begin, DateTime end) {
             return end - begin;
+        }
+
+        private void JimuButton_Click(object sender, RoutedEventArgs e) {
+            if (recording) {
+                StatusText.Text = "作業中のため開始できません";
+                return;
+            }
+            WorkContent.Text = "事務作業";
+            RecordButton_Click(sender, e);
+        }
+
+        private void InnerMtgButton_Click(object sender, RoutedEventArgs e) {
+            if (recording) {
+                StatusText.Text = "作業中のため開始できません";
+                return;
+            }
+            WorkContent.Text = "部内会議";
+            RecordButton_Click(sender, e);
+        }
+
+        private void PcSetupButton_Click(object sender, RoutedEventArgs e) {
+            if (recording) {
+                StatusText.Text = "作業中のため開始できません";
+                return;
+            }
+            WorkContent.Text = "PCセットアップ";
+            RecordButton_Click(sender, e);
         }
     }
 }

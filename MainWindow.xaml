@@ -6,10 +6,59 @@
         xmlns:local="clr-namespace:workhour"
         mc:Ignorable="d"
         Title="MainWindow" Height="449" Width="408">
-    <Grid Margin="0,0,0,-16">
-        <TextBox x:Name="WorkContent" HorizontalAlignment="Left" Margin="58,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="295" Height="46" FontFamily="Noto Sans JP DemiLight" FontSize="16"/>
-        <Button x:Name="RecordButton" Content="開始" HorizontalAlignment="Left" Margin="58,139,0,0" VerticalAlignment="Top" Height="57" Width="295" FontFamily="Noto Sans JP DemiLight" FontSize="20" Click="RecordButton_Click" Background="#FFBFE4CA"/>
-        <ListView ItemsSource="{Binding Works}" Margin="10,214,10,26" FontFamily="Noto Sans JP DemiLight" FontSize="14" d:ItemsSource="{d:SampleData ItemCount=5}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ショートカット -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+            <Button Width="Auto" Height="30" Margin="5,5,5,5" Content="事務" FontFamily="Noto Sans JP DemiLight" FontSize="14" Click="JimuButton_Click"/>
+            <Button Width="Auto" Height="30" Margin="5,5,5,5" Content="部会" FontFamily="Noto Sans JP DemiLight" FontSize="14" Click="InnerMtgButton_Click"/>
+            <Button Width="30" Height="30" Margin="5,5,5,5" Content="PC" FontFamily="Noto Sans JP DemiLight" FontSize="14" Click="PcSetupButton_Click"/>
+        </StackPanel>
+
+        <!-- 作業内容 -->
+        <TextBox Grid.Row="1"
+                 x:Name="WorkContent"
+                 HorizontalAlignment="Stretch"
+                 Margin="0,0,0,5"
+                 TextWrapping="Wrap"
+                 FontFamily="Noto Sans JP DemiLight"
+                 FontSize="16"/>
+
+        <!-- 作業区分 -->
+        <ComboBox Grid.Row="2"
+                  ItemsSource="{Binding WorkCases}"
+                  HorizontalAlignment="Stretch"
+                  Margin="0,0,0,5"
+                  FontFamily="Noto Sans JP DemiLight"
+                  FontSize="16"/>
+
+        <!-- 開始／終了ボタン -->
+        <Button Grid.Row="3"
+                x:Name="RecordButton"
+                Content="開始"
+                HorizontalAlignment="Stretch"
+                Margin="0,0,0,5"
+                FontFamily="Noto Sans JP DemiLight"
+                FontSize="20"
+                Click="RecordButton_Click"
+                Background="#FFBFE4CA"/>
+
+        <!-- 記録一覧 -->
+        <ListView Grid.Row="4"
+                  ItemsSource="{Binding Works}"
+                  FontFamily="Noto Sans JP DemiLight"
+                  FontSize="14"
+                  d:ItemsSource="{d:SampleData ItemCount=5}">
+
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="内容" DisplayMemberBinding="{Binding Content}" />
@@ -19,6 +68,9 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <ComboBox Margin="58,85,55,329" ItemsSource="{Binding WorkCases}" RenderTransformOrigin="0.498,0.73" FontFamily="Noto Sans JP DemiLight" FontSize="16"/>
+
+        <StatusBar Grid.Row="5">
+            <TextBlock x:Name="StatusText" Text="準備完了"/>
+        </StatusBar>
     </Grid>
 </Window>
